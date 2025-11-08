@@ -1,18 +1,15 @@
 // Minimal mock Express server for RepoMind
 const express = require('express');
 const cors = require('cors');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Allow frontend at http://localhost:3000 (adjust if your frontend runs elsewhere)
-app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:3000'
-}));
-app.use(express.json());
+const DATA_FILE = path.join(__dirname, 'data', 'repos.json');
 
-// Static demo data (3 items)
-const baseDemo = [
+let baseDemo = [
   {
     repo: "vercel/next.js",
     summary: "The React framework for production — hybrid static & server rendering, ISR.",
@@ -36,6 +33,26 @@ const baseDemo = [
   }
 ];
 
+// Try to load repos.json if present (overrides embedded baseDemo)
+try {
+  if (fs.existsSync(DATA_FILE)) {
+    const file = fs.readFileSync(DATA_FILE, 'utf8');
+    const parsed = JSON.parse(file);
+    if (Array.isArray(parsed) && parsed.length) {
+      baseDemo = parsed;
+      console.log('Loaded repos from', DATA_FILE);
+    }
+  }
+} catch (err) {
+  console.warn('Could not load data file, using embedded mock data.', err.message);
+}
+
+// Allow frontend at http://localhost:3000 (adjust if your frontend runs elsewhere)
+app.use(cors({
+  origin: process.env.CORS_ORIGIN || 'http://localhost:3000'
+}));
+app.use(express.json());
+
 // Extended demo generator
 function makeExtendedDemo(query) {
   // generate 15 items by slightly mutating baseDemo
@@ -45,7 +62,7 @@ function makeExtendedDemo(query) {
     res.push({
       repo: `${base.repo.split('/')[0]}/mock-${i}`,
       summary: `${base.summary} (mock result ${i} — matched for "${query || ''}")`,
-      stars: Math.max(0, base.stars - i * 10),
+      stars: Math.max(0, (base.stars || 0) - i * 10),
       language: i % 2 === 0 ? base.language : "JavaScript",
       url: `https://github.com/${base.repo.split('/')[0]}/mock-${i}`
     });
@@ -76,11 +93,11 @@ app.post('/api/search', (req, res) => {
       return res.json(extended);
     }
 
-    // default: return the 3 static demo items (optionally filtered by query)
+    // default: return the static demo items (optionally filtered by query)
     if (query && typeof query === 'string' && query.trim().length > 0) {
       const q = query.toLowerCase();
       const filtered = baseDemo.filter(item =>
-        item.repo.toLowerCase().includes(q) ||
+        (item.repo || '').toLowerCase().includes(q) ||
         (item.summary || '').toLowerCase().includes(q) ||
         (item.language || '').toLowerCase().includes(q)
       );

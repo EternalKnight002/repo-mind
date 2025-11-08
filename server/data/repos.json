@@ -1,0 +1,23 @@
+[
+  {
+    "repo": "vercel/next.js",
+    "summary": "The React Framework",
+    "stars": 135545,
+    "language": "JavaScript",
+    "url": "https://github.com/vercel/next.js"
+  },
+  {
+    "repo": "facebook/react",
+    "summary": "The library for web and native user interfaces.",
+    "stars": 240434,
+    "language": "JavaScript",
+    "url": "https://github.com/facebook/react"
+  },
+  {
+    "repo": "EternalKnight002/repo-mind",
+    "summary": "AI-powered semantic search over GitHub repositories (README-level). Query in  natural language and get curated, summarized repo cards.",
+    "stars": 0,
+    "language": "TypeScript",
+    "url": "https://github.com/EternalKnight002/repo-mind"
+  }
+]
