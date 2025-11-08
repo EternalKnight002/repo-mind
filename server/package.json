@@ -1,0 +1,23 @@
+{
+  "name": "repomind-mock-server",
+  "version": "1.0.0",
+  "description": "Mock backend for RepoMind — minimal Express server for local development",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js --watch index.js --ext js,json",
+    "ingest": "node scripts/ingest_repos.js"
+  },
+  "author": "RepoMind",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  },
+  "overrides": {
+    "semver": ">=7.5.2"
+  }
+}
