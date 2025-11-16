@@ -1,132 +1,69 @@
-# RepoMind Server
+# RepoMind — AI Semantic Search for GitHub
 
-AI-powered backend for semantic GitHub README search using Gemini embeddings + ChromaDB.
+RepoMind is an AI-powered project that lets you **search GitHub repositories by meaning**, not just keywords. It uses embeddings, vector search, and LLM summarization to understand developer queries and return relevant repositories with short AI-generated summaries.
 
 ---
 
 ## 🚀 Features
 
-* Natural-language repo search
-* Gemini embeddings (REST)
-* RAG pipeline (chunk → embed → store → retrieve → summarize)
-* ChromaDB vector storage
-* GitHub README scraping
-* Express.js API
+* Search GitHub repos using **natural language**
+* **AI summaries** of each repo’s README
+* **Vector similarity search** using Pinecone or Chroma
+* **RAG pipeline** (retrieval-augmented generation)
+* Simple REST API for queries
 
 ---
 
-## 🗂 Folder Structure
+## 🧠 Tech Stack
 
-```
-server/
-├── routes/
-├── controllers/
-├── services/
-├── jobs/
-├── utils/
-├── app.js
-├── server.js
-└── package.json
-```
+* **Frontend:** Next.js + Tailwind CSS
+* **Backend:** Node.js + Express
+* **Vector DB:** Pinecone / ChromaDB
+* **LLM:** OpenAI GPT-4-turbo (or Gemini)
+* **Cache:** Redis (optional)
 
 ---
 
-## ⚙️ Tech Stack
-
-* Node.js + Express
-* Gemini REST API
-* ChromaDB
-* Axios
-* Cheerio
-* Dotenv
-
----
-
-## 🔧 Setup
-
-### 1. Install dependencies
+## ⚙️ Setup
 
 ```bash
+# Clone the repo
+git clone https://github.com/your-username/repo-mind.git
+cd repo-mind
+
+# Install dependencies
 npm install
-```
 
-### 2. Create `.env`
+# Copy environment variables
+cp .env.example .env
+# Add your API keys
 
-```
-PORT=5000
-GITHUB_TOKEN=your_github_token
-GEMINI_API_KEY=your_key
-CHROMA_DIR=./chroma
-```
-
-### 3. Start server
-
-```bash
+# Start the development servers
 npm run dev
 ```
 
 ---
 
-## 🛠 Scripts
+## 🔌 API Example
 
-| Script           | Description             |
-| ---------------- | ----------------------- |
-| `npm run dev`    | Start dev server        |
-| `npm start`      | Start production server |
-| `npm run ingest` | Run ingestion job       |
-
----
-
-## 🧩 API Endpoints
-
-### **POST /api/search**
-
-Search repositories semantically.
-
-**Body:**
-
-```json
+```bash
+POST /api/search
 {
-  "query": "react state management libraries",
-  "filters": { "language": "JavaScript" }
+  "query": "best open-source AI chatbot frameworks"
 }
 ```
 
-### **POST /api/ingest**
-
-Trigger ingestion:
+Response:
 
 ```json
-{
-  "repos": ["owner/repo"]
-}
+[
+  {
+    "repo": "microsoft/semantic-kernel",
+    "summary": "A framework for integrating AI models into applications.",
+    "stars": 11000
+  }
+]
 ```
-
----
-
-## 🧵 Data Flow (RAG)
-
-```
-GitHub README → Chunk → Gemini Embed → ChromaDB
-                                 ↑
-                           Query Embedding
-                                 ↑
-                         User Search Query
-                                 ↓
-                       Chroma KNN Retrieval
-                                 ↓
-                       Gemini LLM Summary
-```
-
----
-
-## 🧭 Roadmap
-
-* Add Redis caching
-* Add rate limiting
-* Weekly ingestion cron job
-* Repo-to-repo similarity
-* Advanced filters (stars, topics)
 
 ---
 
