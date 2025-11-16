@@ -1,72 +1,192 @@
-# RepoMind — AI Semantic Search for GitHub
+📡 RepoMind Server
 
-RepoMind is an AI-powered project that lets you **search GitHub repositories by meaning**, not just keywords. It uses embeddings, vector search, and LLM summarization to understand developer queries and return relevant repositories with short AI-generated summaries.
+AI-powered backend for semantic GitHub README search
 
----
+This folder contains the backend/API server for RepoMind, powering ingestion, embedding, vector search, and AI-generated summaries using Gemini + ChromaDB.
 
-## 🚀 Features
+🚀 Features
 
-* Search GitHub repos using **natural language**
-* **AI summaries** of each repo’s README
-* **Vector similarity search** using Pinecone or Chroma
-* **RAG pipeline** (retrieval-augmented generation)
-* Simple REST API for queries
+🔍 Natural-language repo search
+Convert user queries → embeddings → retrieve similar README chunks → summarize.
 
----
+🤖 Gemini embeddings (REST API)
+Zero paid services required; fully compatible with Google’s free-tier API.
 
-## 🧠 Tech Stack
+🧠 RAG pipeline
+Chunking → embeddings → vector DB retrieval → LLM summarization.
 
-* **Frontend:** Next.js + Tailwind CSS
-* **Backend:** Node.js + Express
-* **Vector DB:** Pinecone / ChromaDB
-* **LLM:** OpenAI GPT-4-turbo (or Gemini)
-* **Cache:** Redis (optional)
+📦 ChromaDB local vector store
+Free, easy-to-set-up, ideal for demo and local development.
 
----
+🕸 GitHub README scraper
+Fetches and normalizes repository README content.
 
-## ⚙️ Setup
+🔐 Fully environment-driven config (.env)
 
-```bash
-# Clone the repo
-git clone https://github.com/your-username/repo-mind.git
-cd repo-mind
+🗂 Folder Structure
+server/
+│
+├── routes/
+│   └── searchRoutes.js
+│
+├── controllers/
+│   └── searchController.js
+│
+├── services/
+│   ├── githubService.js
+│   ├── geminiEmbedService.js
+│   ├── chromaService.js
+│   └── summarizerService.js
+│
+├── jobs/
+│   └── ingestRepo.js
+│
+├── utils/
+│   └── chunker.js
+│
+├── app.js
+├── server.js
+└── package.json
 
-# Install dependencies
+⚙️ Tech Stack
+
+Node.js + Express
+
+Gemini REST API
+
+ChromaDB (local or persistent directory)
+
+Axios for external API calls
+
+Cheerio for README cleanup
+
+Dotenv for configuration
+
+🔧 Setup Instructions
+1️⃣ Install dependencies
+cd server
 npm install
 
-# Copy environment variables
-cp .env.example .env
-# Add your API keys
+2️⃣ Create environment file
 
-# Start the development servers
+Create .env:
+
+PORT=5000
+GITHUB_TOKEN=your_github_token
+GEMINI_API_KEY=your_key
+CHROMA_DIR=./chroma
+
+
+GitHub token optional, but increases rate limits.
+
+3️⃣ Start development server
 npm run dev
-```
 
----
 
-## 🔌 API Example
+OR:
 
-```bash
+node server.js
+
+🛠 Available Scripts
+Script	Purpose
+npm run dev	Starts server with nodemon
+npm start	Starts production server
+npm run ingest	Runs ingestion script manually
+🧩 API Endpoints
 POST /api/search
+
+Search for repositories semantically.
+
+Body:
+
 {
-  "query": "best open-source AI chatbot frameworks"
+  "query": "react state management libraries",
+  "filters": { "language": "JavaScript" }
 }
-```
 
-Response:
 
-```json
-[
-  {
-    "repo": "microsoft/semantic-kernel",
-    "summary": "A framework for integrating AI models into applications.",
-    "stars": 11000
-  }
-]
-```
+Returns:
 
----
+Repo name
 
-## 📄 License
+Clean summary (LLM)
+
+Stars
+
+Links
+
+Matched chunk excerpt
+
+Similarity score
+
+POST /api/ingest
+
+Protected or manual-only (CLI recommended)
+
+{
+  "repos": ["owner/repo"]
+}
+
+
+Runs:
+
+Fetch README
+
+Chunk
+
+Embed
+
+Upsert to Chroma
+
+🧵 Data Flow (Backend RAG Pipeline)
+GitHub README → Chunk → Gemini Embeddings → ChromaDB
+                                 ↑
+                           Query Embedding
+                                 ↑
+                         User Search Query
+                                 ↓
+                       Chroma similarity KNN
+                                 ↓
+                       LLM Summary (Gemini)
+
+🪝 Key Services
+/services/githubService.js
+
+Fetch README + metadata.
+
+/services/geminiEmbedService.js
+
+We use REST version of Gemini:
+
+POST https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent
+
+/services/chromaService.js
+
+Local vector store with metadata.
+
+/services/summarizerService.js
+
+LLM-based summarization.
+
+🔐 Environment Variables
+Name	Description
+PORT	Server port
+GITHUB_TOKEN	For GitHub API
+GEMINI_API_KEY	Gemini REST key
+CHROMA_DIR	Vector DB directory
+
+🧭 Roadmap (Server)
+
+ Caching using Redis
+
+ Rate-limit protection middleware
+
+ Batch ingestion of top trending repos
+
+ Repo-to-repo similarity endpoint
+
+ Scheduled weekly refresh job
+
+ ## 📄 License
 
 MIT License © 2025 RepoMind
