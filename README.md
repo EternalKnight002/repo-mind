@@ -1,192 +1,135 @@
-📡 RepoMind Server
+# RepoMind Server
 
-AI-powered backend for semantic GitHub README search
+AI-powered backend for semantic GitHub README search using Gemini embeddings + ChromaDB.
 
-This folder contains the backend/API server for RepoMind, powering ingestion, embedding, vector search, and AI-generated summaries using Gemini + ChromaDB.
+---
 
-🚀 Features
+## 🚀 Features
 
-🔍 Natural-language repo search
-Convert user queries → embeddings → retrieve similar README chunks → summarize.
+* Natural-language repo search
+* Gemini embeddings (REST)
+* RAG pipeline (chunk → embed → store → retrieve → summarize)
+* ChromaDB vector storage
+* GitHub README scraping
+* Express.js API
 
-🤖 Gemini embeddings (REST API)
-Zero paid services required; fully compatible with Google’s free-tier API.
+---
 
-🧠 RAG pipeline
-Chunking → embeddings → vector DB retrieval → LLM summarization.
+## 🗂 Folder Structure
 
-📦 ChromaDB local vector store
-Free, easy-to-set-up, ideal for demo and local development.
-
-🕸 GitHub README scraper
-Fetches and normalizes repository README content.
-
-🔐 Fully environment-driven config (.env)
-
-🗂 Folder Structure
+```
 server/
-│
 ├── routes/
-│   └── searchRoutes.js
-│
 ├── controllers/
-│   └── searchController.js
-│
 ├── services/
-│   ├── githubService.js
-│   ├── geminiEmbedService.js
-│   ├── chromaService.js
-│   └── summarizerService.js
-│
 ├── jobs/
-│   └── ingestRepo.js
-│
 ├── utils/
-│   └── chunker.js
-│
 ├── app.js
 ├── server.js
 └── package.json
+```
 
-⚙️ Tech Stack
+---
 
-Node.js + Express
+## ⚙️ Tech Stack
 
-Gemini REST API
+* Node.js + Express
+* Gemini REST API
+* ChromaDB
+* Axios
+* Cheerio
+* Dotenv
 
-ChromaDB (local or persistent directory)
+---
 
-Axios for external API calls
+## 🔧 Setup
 
-Cheerio for README cleanup
+### 1. Install dependencies
 
-Dotenv for configuration
-
-🔧 Setup Instructions
-1️⃣ Install dependencies
-cd server
+```bash
 npm install
+```
 
-2️⃣ Create environment file
+### 2. Create `.env`
 
-Create .env:
-
+```
 PORT=5000
 GITHUB_TOKEN=your_github_token
 GEMINI_API_KEY=your_key
 CHROMA_DIR=./chroma
+```
 
+### 3. Start server
 
-GitHub token optional, but increases rate limits.
-
-3️⃣ Start development server
+```bash
 npm run dev
+```
 
+---
 
-OR:
+## 🛠 Scripts
 
-node server.js
+| Script           | Description             |
+| ---------------- | ----------------------- |
+| `npm run dev`    | Start dev server        |
+| `npm start`      | Start production server |
+| `npm run ingest` | Run ingestion job       |
 
-🛠 Available Scripts
-Script	Purpose
-npm run dev	Starts server with nodemon
-npm start	Starts production server
-npm run ingest	Runs ingestion script manually
-🧩 API Endpoints
-POST /api/search
+---
 
-Search for repositories semantically.
+## 🧩 API Endpoints
 
-Body:
+### **POST /api/search**
 
+Search repositories semantically.
+
+**Body:**
+
+```json
 {
   "query": "react state management libraries",
   "filters": { "language": "JavaScript" }
 }
+```
 
+### **POST /api/ingest**
 
-Returns:
+Trigger ingestion:
 
-Repo name
-
-Clean summary (LLM)
-
-Stars
-
-Links
-
-Matched chunk excerpt
-
-Similarity score
-
-POST /api/ingest
-
-Protected or manual-only (CLI recommended)
-
+```json
 {
   "repos": ["owner/repo"]
 }
+```
 
+---
 
-Runs:
+## 🧵 Data Flow (RAG)
 
-Fetch README
-
-Chunk
-
-Embed
-
-Upsert to Chroma
-
-🧵 Data Flow (Backend RAG Pipeline)
-GitHub README → Chunk → Gemini Embeddings → ChromaDB
+```
+GitHub README → Chunk → Gemini Embed → ChromaDB
                                  ↑
                            Query Embedding
                                  ↑
                          User Search Query
                                  ↓
-                       Chroma similarity KNN
+                       Chroma KNN Retrieval
                                  ↓
-                       LLM Summary (Gemini)
+                       Gemini LLM Summary
+```
 
-🪝 Key Services
-/services/githubService.js
+---
 
-Fetch README + metadata.
+## 🧭 Roadmap
 
-/services/geminiEmbedService.js
+* Add Redis caching
+* Add rate limiting
+* Weekly ingestion cron job
+* Repo-to-repo similarity
+* Advanced filters (stars, topics)
 
-We use REST version of Gemini:
+---
 
-POST https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent
-
-/services/chromaService.js
-
-Local vector store with metadata.
-
-/services/summarizerService.js
-
-LLM-based summarization.
-
-🔐 Environment Variables
-Name	Description
-PORT	Server port
-GITHUB_TOKEN	For GitHub API
-GEMINI_API_KEY	Gemini REST key
-CHROMA_DIR	Vector DB directory
-
-🧭 Roadmap (Server)
-
- Caching using Redis
-
- Rate-limit protection middleware
-
- Batch ingestion of top trending repos
-
- Repo-to-repo similarity endpoint
-
- Scheduled weekly refresh job
-
- ## 📄 License
+## 📄 License
 
 MIT License © 2025 RepoMind
